@@ -6,7 +6,6 @@ import { styled } from 'styled-components';
 function App() {
   return (
     <AppPage>
-      <h1>App Page</h1>
       <BrowserRouter>
         <NavBar>
           <Link to="/">Home</Link>
@@ -27,9 +26,8 @@ const AppPage = styled.nav`
 
 const NavBar = styled.nav`
     display: flex;
-    width: 50%;
-    align-items: space-between;
-    justify-content: space-around;
+    justify-items: center;
+    align-items: center;
     
 `;
 
