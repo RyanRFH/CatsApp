@@ -1,9 +1,8 @@
 
-
 import React from 'react'
-
-import logo from '../Resorces/logo.jpg'
-
+// import '.../node_modules/bootstrap/dist/css/bootstrap.min.css'
+import logo from '../Resources/logo.jpg'
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const ContactForm = () => {
   const [form, setForm] = React.useState('Send')
