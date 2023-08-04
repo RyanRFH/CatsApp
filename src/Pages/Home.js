@@ -50,7 +50,7 @@ const Home = (props) => {
     const basketAdd = (index) => {
         // Remove item from basket
         if (props.basketArray.includes(sortedCats[index])) {
-            let itemIndex = props.basketArray.findIndex((item) => item === cats[index]);
+            let itemIndex = props.basketArray.findIndex((item) => item === sortedCats[index]);
             let tempArray = [...props.basketArray];
             tempArray.splice(itemIndex, 1);
             props.setBasket(tempArray);
