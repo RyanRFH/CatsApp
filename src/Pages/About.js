@@ -95,11 +95,6 @@ Thank you for choosing Cats4Lyfe, where the love for cats is our way of life!
     </div>
 
 
-<footer style={{backgroundColor:'grey', height:'200px',color:'white'}}>
-  placeholder stuff for the footer. No clue how to make one in bootstrap but that's fine
-</footer>
-
-
 
     
  </div>

@@ -72,9 +72,7 @@ At Cats4Lyfe, we offer a range of products and resources to support you in provi
 
         {}
       </div>
-      <footer style={{backgroundColor:'grey', height:'400px',color:'white'}}>
-  placeholder stuff for the footer. No clue how to make one in bootstrap but that's fine
-</footer>
+
 
     </div>
 
