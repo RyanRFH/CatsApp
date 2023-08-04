@@ -75,7 +75,6 @@ function App() {
         </Routes>
       </BrowserRouter>
       <footer style={{backgroundColor:'grey', height:'200px',color:'white',width:'100%',marginTop:"20px"}}>
-  placeholder stuff for the footer. No clue how to make one in bootstrap but that's fine
 </footer>
 
     </AppPage>
