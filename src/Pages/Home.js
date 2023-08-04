@@ -4,7 +4,7 @@ import { faker } from "@faker-js/faker";
 import BasketLogo from "../Resources/shopping-basket.png";
 import Modal from "react-modal";
 import '../App.css';
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 Modal.setAppElement("#root")
 
 
@@ -12,9 +12,32 @@ Modal.setAppElement("#root")
 
 const Home = (props) => {
     
-    const [cats, setCats] = useState(props.catsArray);
-    // const [basket, setBasket] = useState(props.basketArray);
+    const [cats, setCats] = useState([]);
     const [total, setTotal] = useState();
+    const [sortType, setSortType] = useState("Name");
+    const [sortedCats, setSortedCats] = useState([]);
+
+    useEffect(() => {
+        setCats(props.catsArray)
+
+    }, [props.catsArray]);
+
+    useEffect(() => {
+        console.log("USE EFFECT IS RUNNING");
+        console.log(cats);
+        if (sortType === "PriceUp") {
+            setSortedCats([...cats].sort((a, b) => (a.catPrice > b.catPrice) ? 1 : -1));
+        } else  if (sortType === "PriceDown") {
+            setSortedCats([...cats].sort((a, b) => (a.catPrice < b.catPrice) ? 1 : -1));
+        } else if (sortType === "Name") {
+            setSortedCats([...cats].sort((a, b) => (a.catName > b.catName) ? 1 : -1));
+        }
+    }, [sortType, cats])
+
+
+
+
+    
 
     useEffect(() =>{
         let totalPrice = 0;
@@ -26,7 +49,7 @@ const Home = (props) => {
 
     const basketAdd = (index) => {
         // Remove item from basket
-        if (props.basketArray.includes(cats[index])) {
+        if (props.basketArray.includes(sortedCats[index])) {
             let itemIndex = props.basketArray.findIndex((item) => item === cats[index]);
             let tempArray = [...props.basketArray];
             tempArray.splice(itemIndex, 1);
@@ -37,7 +60,7 @@ const Home = (props) => {
         } else {
             //Add item to basket
             let tempArray = [...props.basketArray];
-            tempArray.push(cats[index]);
+            tempArray.push(sortedCats[index]);
             props.setBasket(tempArray);
             console.log("CAT ADDED FROM BASKET");
             
@@ -70,23 +93,34 @@ const Home = (props) => {
         })
     }
 
-
     return (
-        <div id="homePage">
-            <nav>
-                <Basket onClick={openModal} src={BasketLogo} />
-            </nav>
+        <div className="homePage">
+            <DropdownBasketWrap>
+                <label>
+                    <p>Sort by:</p>
+                    <select onChange={(event) => setSortType(event.target.value)}>
+                        <option value="Name">Name</option>
+                        <option value="PriceUp">Price (ascending)</option>
+                        <option value="PriceDown">Price (descending)</option>
+                    </select>
+                </label>
+                <BasketIconTextBox onClick={openModal}>
+                    <BasketIconWrapper>
+
+                        <Basket  src={BasketLogo} />
+                        
+                    </BasketIconWrapper>
+                    <h3>Basket</h3>
+                </BasketIconTextBox>
+            </DropdownBasketWrap>
             <Modal
                 isOpen={modalIsOpen}
                 onRequestClose={closeModal}
                 contentLabel="basket"
-                // overlayClassName="Overlay"
                 className="Modal"
                 shouldCloseOnOverlayClick={true}
+                overlayClassName="overlay"
             >
-  
-
-
                 <BasketHeaderWrapper>
                     <div>
                         <h1>Basket</h1>
@@ -110,36 +144,32 @@ const Home = (props) => {
                     })}
                 </BasketItemsWrapper>
                 <p>Total: £{total}</p>
-        
-
+                <Link to={props.basketArray.length < 1 ? "" : "/Checkout"}>
+                    <CheckoutButton>Checkout now</CheckoutButton>
+                </Link>
             </Modal>
+
             <CatContainer>
+                {sortedCats.map((eachCat, index) => {
+                    return (
+                        <CatBox key={index}>
+                            <CatWrapper  onClick={() => basketAdd(index)}>
 
-            {cats.map((eachCat, index) => {
-                return (
-                    <CatBox>
-                        <CatWrapper key={index} onClick={() => basketAdd(index)}>
+                                <AddRemoveBasketWrapper>
+                                    <h1>{props.basketArray.includes(eachCat) ? "Remove from basket" : "Add to Basket"} </h1>
+                                </AddRemoveBasketWrapper>
 
-
-                        <AddRemoveBasketWrapper>
-                            <h1>{props.basketArray.includes(eachCat) ? "Remove from basket" : "Add to Basket"} </h1>
-                        </AddRemoveBasketWrapper>
-                        
-                        <CatImage src={eachCat.url}></CatImage>
-                        <p>{eachCat.catName}</p>
-                        <p>£{eachCat.catPrice}</p>                      
-                        
-                    </CatWrapper>
-
-                    
-                    <Link to={`/Cat/${eachCat.catName}`} state={eachCat}>
-                        <button>About Cat</button>
-                    </Link>
-
-                    </CatBox>
-
-                )
-            })}
+                                <CatImage src={eachCat.url}></CatImage>
+                                <p>{eachCat.catName}</p>
+                                <p>£{eachCat.catPrice}</p>
+                            </CatWrapper>
+                            <Link to={`/Cat/${eachCat.catName}`} state={eachCat}>
+                                <button>About Cat</button>
+                            </Link>
+                        </CatBox>
+                    )
+                })}
+            
         </CatContainer>
         </div>
 
@@ -147,9 +177,51 @@ const Home = (props) => {
     );
 };
 
-// const BasketModal = styled.Modal`
-//     display: flex;
-// `;
+
+const DropdownBasketWrap = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: centre; 
+
+    label{
+        padding: 0 4vw;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        p {
+            font-size: larger;
+            margin: 1vw;
+        }
+    }
+
+`
+
+
+
+const CheckoutButton = styled.button`
+    background-color: rgb(224, 134, 38);
+    padding: 1vh;
+    font-size: larger;
+    border-radius: 10px;
+    width: 100%
+`
+
+
+const BasketIconWrapper = styled.div`
+    display: flex;
+    justify-content: center;
+    margin-right: 0.8vw;
+`;
+
+const BasketIconTextBox = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    padding: 2vw 2vw 0 0;
+    margin-right: 3vw;
+    cursor: pointer;
+`
 
 const CatBox = styled.div`
     display: flex;
@@ -160,8 +232,9 @@ const CatBox = styled.div`
         background-color: rgb(242, 180, 113);
         border: none;
         cursor: pointer;
-        width: 20vw;
+        width: 21vw;
         font-size: larger;
+        border-radius: 0 0 10px 10px;
     }
 `;
 
@@ -182,22 +255,21 @@ const BasketItemWrapper = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    border: 2px dashed black;
+    border: 4px dashed rgb(224, 134, 38);
     margin: 1vw;
 `;
 
 const BasketHeaderWrapper = styled.div`
     display: flex;
     width: 100%;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     button {
+        font-size: larger;
         align-self: flex-start;
-        justify-self: flex-end;
+        padding: 0 4%;
     }
-    div{
-        margin: 0 20%;
-    }
+    
     
     
 `;
@@ -221,15 +293,21 @@ const BasketCatImage = styled.img`
 
 const CatWrapper = styled.div`
     position: relative;
-    width: 20vw;
+    width: 21vw;
     height: 30vw;
     background-color: rgb(224, 134, 38);
-    margin: 3vw 2vw 0 2vw;
+    margin: 3vw 1vw 0 1vw;
+    padding: 0 1vw;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    border-radius: 10px;
+    border-radius: 10px 10px 0px 0px;
+    cursor: pointer;
+
+    p {
+        font-size: larger;
+    }
 
     div {
         display: none;
@@ -256,10 +334,13 @@ const CatWrapper = styled.div`
 const CatContainer = styled.div`
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
 `;
 
 const Basket = styled.img`
-    width: 100px;
+    width: 4vw;
+    padding-top: 1vh;
+    cursor: pointer;
 `;
 
 export default Home;
